@@ -31,8 +31,8 @@ jobs:
           SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA }}
           SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
         run: |
-          # Correct CLI syntax (connection name comes right after add)
-          snow connection add ci_cd_conn \
+          # Configure default connection (no name needed)
+          snow connection add \
             --account $SNOWFLAKE_ACCOUNT \
             --username $SNOWFLAKE_USER \
             --password $SNOWFLAKE_PASSWORD \
@@ -43,10 +43,13 @@ jobs:
             --default \
             --no-interactive
 
-          # Run all SQL scripts in order
+          # Optional: list connections for debugging
+          snow connection list
+
+          # Run all SQL scripts in order using default connection
           for file in sql/*.sql; do
             echo "Running $file..."
-            snow sql -c ci_cd_conn -f "$file"
+            snow sql -f "$file"
           done
 
 
