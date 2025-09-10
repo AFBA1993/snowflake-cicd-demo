@@ -31,10 +31,20 @@ jobs:
           SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA }}
           SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
         run: |
+          # Configure default connection from env vars
+          snow connection add ci_cd_conn \
+            --account $SNOWFLAKE_ACCOUNT \
+            --username $SNOWFLAKE_USER \
+            --password $SNOWFLAKE_PASSWORD \
+            --role $SNOWFLAKE_ROLE \
+            --database $SNOWFLAKE_DATABASE \
+            --schema $SNOWFLAKE_SCHEMA \
+            --warehouse $SNOWFLAKE_WAREHOUSE \
+            --default
+
+          # Loop through SQL files and run them
           for file in sql/*.sql; do
             echo "Running $file..."
-            snow sql -a $SNOWFLAKE_ACCOUNT -u $SNOWFLAKE_USER \
-              -r $SNOWFLAKE_ROLE -d $SNOWFLAKE_DATABASE -s $SNOWFLAKE_SCHEMA \
-              -w $SNOWFLAKE_WAREHOUSE -p $SNOWFLAKE_PASSWORD \
-              -f "$file"
+            snow sql -f "$file"
           done
+
