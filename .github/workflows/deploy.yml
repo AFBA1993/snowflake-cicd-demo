@@ -33,6 +33,8 @@ jobs:
         run: |
           for file in sql/*.sql; do
             echo "Running $file..."
-            snowflake -a $SNOWFLAKE_ACCOUNT -u $SNOWFLAKE_USER -r $SNOWFLAKE_ROLE -d $SNOWFLAKE_DATABASE -s $SNOWFLAKE_SCHEMA -w $SNOWFLAKE_WAREHOUSE -p $SNOWFLAKE_PASSWORD -f "$file"
+            snow sql -a $SNOWFLAKE_ACCOUNT -u $SNOWFLAKE_USER \
+              -r $SNOWFLAKE_ROLE -d $SNOWFLAKE_DATABASE -s $SNOWFLAKE_SCHEMA \
+              -w $SNOWFLAKE_WAREHOUSE -p $SNOWFLAKE_PASSWORD \
+              -f "$file"
           done
-
