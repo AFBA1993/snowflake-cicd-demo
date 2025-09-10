@@ -31,8 +31,8 @@ jobs:
           SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA }}
           SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
         run: |
-          # Configure default connection from env vars
-          snow connection add ci_cd_conn \
+          # Configure default connection (no connection name required)
+          snow connection add \
             --account $SNOWFLAKE_ACCOUNT \
             --username $SNOWFLAKE_USER \
             --password $SNOWFLAKE_PASSWORD \
@@ -42,9 +42,8 @@ jobs:
             --warehouse $SNOWFLAKE_WAREHOUSE \
             --default
 
-          # Loop through SQL files and run them
+          # Run all SQL scripts in order
           for file in sql/*.sql; do
             echo "Running $file..."
             snow sql -f "$file"
           done
-
