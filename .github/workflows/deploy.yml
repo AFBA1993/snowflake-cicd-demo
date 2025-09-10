@@ -41,7 +41,7 @@ jobs:
             --schema $SNOWFLAKE_SCHEMA \
             --warehouse $SNOWFLAKE_WAREHOUSE \
             --default \
-            --non-interactive
+            --no-interactive
 
           # Run all SQL scripts in order
           for file in sql/*.sql; do
