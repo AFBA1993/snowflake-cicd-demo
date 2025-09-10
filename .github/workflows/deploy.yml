@@ -3,7 +3,7 @@ name: Deploy to Snowflake
 on:
   push:
     branches:
-      - main   # runs whenever you push to main branch
+      - main
 
 jobs:
   deploy:
@@ -13,32 +13,26 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Install SnowSQL
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y snowflake-snowsql
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install Snowflake CLI
+        run: pip install snowflake-cli
 
       - name: Run SQL scripts
         env:
           SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
           SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+          SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
           SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
           SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
           SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA }}
           SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
-          SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
         run: |
           for file in sql/*.sql; do
             echo "Running $file..."
-            snowsql \
-              -a $SNOWFLAKE_ACCOUNT \
-              -u $SNOWFLAKE_USER \
-              -r $SNOWFLAKE_ROLE \
-              -d $SNOWFLAKE_DATABASE \
-              -s $SNOWFLAKE_SCHEMA \
-              -w $SNOWFLAKE_WAREHOUSE \
-              -q "$(cat $file)" \
-              -o friendly=false \
-              -o exit_on_error=true \
-              -p $SNOWFLAKE_PASSWORD
+            snowflake -a $SNOWFLAKE_ACCOUNT -u $SNOWFLAKE_USER -r $SNOWFLAKE_ROLE -d $SNOWFLAKE_DATABASE -s $SNOWFLAKE_SCHEMA -w $SNOWFLAKE_WAREHOUSE -p $SNOWFLAKE_PASSWORD -f "$file"
           done
+
